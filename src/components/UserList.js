@@ -77,7 +77,7 @@ const UserList = () => {
         {/* Age */}
         <div className="mb-4">
           <label htmlFor="age" className="block text-md text-gray-900">
-            Age
+            Age:
           </label>
           <select
             id="age"
@@ -100,7 +100,7 @@ const UserList = () => {
         {/* Nationality */}
         <div className="mb-4">
           <label htmlFor="nationality" className="block text-md text-gray-900">
-            Nationality
+            Nationality:
           </label>
           <select
             id="nationality"
@@ -115,6 +115,11 @@ const UserList = () => {
             <option value="">All</option>
             <option value="AU">AU</option>
             <option value="BR">BR</option>
+            <option value="US">US</option>
+            <option value="NZ">NZ</option>
+            <option value="ES">ES</option>
+            <option value="FR">FR</option>
+            <option value="GB">GB</option>
           </select>
         </div>
 
@@ -168,11 +173,11 @@ const UserList = () => {
             ></span>
           </div>
         ) : (
-          <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {filteredUsers.map((user) => (
               <div key={user.login.uuid}>
                 <UserCard
-                  image={user.picture.thumbnail}
+                  image={user.picture.large}
                   name={`${user.name.first}
         ${user.name.last}`}
                   age={user.dob.age}
