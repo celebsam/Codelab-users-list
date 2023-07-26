@@ -6,8 +6,8 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [ageRange, setAgeRange] = useState({ min: "", max: "" });
   const [nationality, setNationality] = useState("");
+  const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [searchName, setSearchName] = useState("");
 
@@ -31,12 +31,20 @@ const UserList = () => {
   const handleFilter = () => {
     let filteredUsers = [...users];
 
-    if (ageRange.min !== "" && ageRange.max !== "") {
+    if (age === "16-30") {
+      filteredUsers = filteredUsers.filter((user) => user.dob.age <= 30);
+    } else if (age === "31-50") {
       filteredUsers = filteredUsers.filter(
-        (user) =>
-          user.dob.age >= parseInt(ageRange.min) &&
-          user.dob.age <= parseInt(ageRange.max)
+        (user) => user.dob.age > 30 && user.dob.age <= 50
       );
+    } else if (age === "51-70") {
+      filteredUsers = filteredUsers.filter(
+        (user) => user.dob.age > 50 && user.dob.age <= 70
+      );
+    } else if (age === "71-100") {
+      filteredUsers = filteredUsers.filter((user) => user.dob.age > 70);
+    } else {
+      filteredUsers = filteredUsers.filter((user) => user.dob.age > 15);
     }
 
     if (nationality) {
@@ -60,33 +68,38 @@ const UserList = () => {
 
   useEffect(() => {
     handleFilter();
-  }, [users, ageRange, nationality, gender, searchName]);
+  }, [users, nationality, gender, searchName, age]);
 
   return (
     <div>
       {/* Filter options */}
       <form>
-        {/* Age Range */}
-        <label>
-          Age Range:
-          <input
-            type="number"
-            value={ageRange.min}
-            onChange={(e) => setAgeRange({ ...ageRange, min: e.target.value })}
-          />
-          <input
-            type="number"
-            value={ageRange.max}
-            onChange={(e) => setAgeRange({ ...ageRange, max: e.target.value })}
-          />
-        </label>
+        {/* Age */}
+        <div className="mb-4">
+          <label htmlFor="age" className="block text-md text-gray-900">
+            Age
+          </label>
+          <select
+            id="age"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full
+            p-2.5 dark:bg-gray-700 dark:border-gray-600
+            dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500
+            dark:focus:border-blue-500"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+          >
+            <option value="">All</option>
+            <option value="16-30">16 - 30</option>
+            <option value="31-50">31 - 50</option>
+            <option value="51-70">51 - 70</option>
+            <option value="71-100">71 - 100</option>
+          </select>
+        </div>
 
         {/* Nationality */}
         <div className="mb-4">
-          <label
-            htmlFor="nationality"
-            className="block mb-1 text-md text-gray-900"
-          >
+          <label htmlFor="nationality" className="block text-md text-gray-900">
             Nationality
           </label>
           <select
@@ -102,13 +115,12 @@ const UserList = () => {
             <option value="">All</option>
             <option value="AU">AU</option>
             <option value="BR">BR</option>
-            {/* Add more nationality options here */}
           </select>
         </div>
 
         {/* Gender */}
         <div className="mb-4">
-          <label htmlFor="gender" className="block mb-1 text-md text-gray-900">
+          <label htmlFor="gender" className="block text-md text-gray-900">
             Gender:
           </label>
           <select
@@ -137,6 +149,7 @@ const UserList = () => {
           p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
           dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               type="text"
+              placeholder="Enter text"
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
             />
@@ -145,7 +158,6 @@ const UserList = () => {
       </form>
 
       {/* Display users */}
-
       <div>
         <h3 className="text-xl mb-1 mt-5 font-bold">Results</h3>
         {loading ? (
@@ -171,6 +183,10 @@ const UserList = () => {
             ))}
           </div>
         )}
+
+        {!loading && filteredUsers.length < 1 ? (
+          <h3 className="text-xl mb-1 mt-5 text-center">No results found!</h3>
+        ) : null}
       </div>
     </div>
   );
