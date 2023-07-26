@@ -1,117 +1,176 @@
-// src/UserList.js
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import UserCard from "./UserCard";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [filters, setFilters] = useState({
-    ageRange: { min: 0, max: 100 },
-    nationality: 'all',
-    gender: 'all',
-    search: '',
-  });
+  const [ageRange, setAgeRange] = useState({ min: "", max: "" });
+  const [nationality, setNationality] = useState("");
+  const [gender, setGender] = useState("");
+  const [searchName, setSearchName] = useState("");
 
   useEffect(() => {
     // Fetch users data from randomuser.me API
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('https://randomuser.me/api/?results=50');
+        const response = await axios.get(
+          "https://randomuser.me/api/?results=50"
+        );
         setUsers(response.data.results);
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        setLoading(false);
+        console.error("Error fetching users:", error);
       }
     };
     fetchUsers();
   }, []);
 
-  // Apply filters and search when users or filters change
+  const handleFilter = () => {
+    let filteredUsers = [...users];
+
+    if (ageRange.min !== "" && ageRange.max !== "") {
+      filteredUsers = filteredUsers.filter(
+        (user) =>
+          user.dob.age >= parseInt(ageRange.min) &&
+          user.dob.age <= parseInt(ageRange.max)
+      );
+    }
+
+    if (nationality) {
+      filteredUsers = filteredUsers.filter((user) => user.nat === nationality);
+    }
+
+    if (gender) {
+      filteredUsers = filteredUsers.filter((user) => user.gender === gender);
+    }
+
+    if (searchName) {
+      filteredUsers = filteredUsers.filter((user) =>
+        `${user.name.first} ${user.name.last}`
+          .toLowerCase()
+          .includes(searchName.toLowerCase())
+      );
+    }
+
+    setFilteredUsers(filteredUsers);
+  };
+
   useEffect(() => {
-    let filtered = users.filter(user => {
-      const { ageRange, nationality, gender, search } = filters;
-      const age = parseInt(user.dob.age);
-      const name = user.name.first.toLowerCase() + user.name.last.toLowerCase();
-
-      // Filter by age
-      if (age < ageRange.min || age > ageRange.max) return false;
-
-      // Filter by nationality
-      if (nationality !== 'all' && user.nat !== nationality) return false;
-
-      // Filter by gender
-      if (gender !== 'all' && user.gender !== gender) return false;
-
-      // Filter by search term in name
-      if (search !== '' && !name.includes(search.toLowerCase())) return false;
-
-      return true;
-    });
-
-    setFilteredUsers(filtered);
-  }, [users, filters]);
+    handleFilter();
+  }, [users, ageRange, nationality, gender, searchName]);
 
   return (
     <div>
       {/* Filter options */}
-      <div>
+      <form>
         {/* Age Range */}
         <label>
           Age Range:
           <input
             type="number"
-            value={filters.ageRange.min}
-            onChange={e => setFilters({ ...filters, ageRange: { ...filters.ageRange, min: e.target.value } })}
+            value={ageRange.min}
+            onChange={(e) => setAgeRange({ ...ageRange, min: e.target.value })}
           />
           <input
             type="number"
-            value={filters.ageRange.max}
-            onChange={e => setFilters({ ...filters, ageRange: { ...filters.ageRange, max: e.target.value } })}
+            value={ageRange.max}
+            onChange={(e) => setAgeRange({ ...ageRange, max: e.target.value })}
           />
         </label>
 
         {/* Nationality */}
-        <label>
-          Nationality:
-          <select value={filters.nationality} onChange={e => setFilters({ ...filters, nationality: e.target.value })}>
-            <option value="all">All</option>
+        <div className="mb-4">
+          <label
+            htmlFor="nationality"
+            className="block mb-1 text-md text-gray-900"
+          >
+            Nationality
+          </label>
+          <select
+            id="nationality"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+            rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full
+            p-2.5 dark:bg-gray-700 dark:border-gray-600
+            dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500
+            dark:focus:border-blue-500"
+            value={nationality}
+            onChange={(e) => setNationality(e.target.value)}
+          >
+            <option value="">All</option>
             <option value="AU">AU</option>
             <option value="BR">BR</option>
             {/* Add more nationality options here */}
           </select>
-        </label>
+        </div>
 
         {/* Gender */}
-        <label>
-          Gender:
-          <select value={filters.gender} onChange={e => setFilters({ ...filters, gender: e.target.value })}>
-            <option value="all">All</option>
+        <div className="mb-4">
+          <label htmlFor="gender" className="block mb-1 text-md text-gray-900">
+            Gender:
+          </label>
+          <select
+            id="gender"
+            name="gender"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+          rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full
+          p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+          dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+          >
+            <option value="">All</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
-        </label>
+        </div>
 
         {/* Search */}
-        <label>
-          Search by Name:
-          <input
-            type="text"
-            value={filters.search}
-            onChange={e => setFilters({ ...filters, search: e.target.value })}
-          />
-        </label>
-      </div>
+        <div>
+          <label>
+            Search by Name:
+            <input
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+          rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full
+          p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+          dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              type="text"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+            />
+          </label>
+        </div>
+      </form>
 
       {/* Display users */}
+
       <div>
-        {filteredUsers.map(user => (
-          <div key={user.login.uuid}>
-            <img src={user.picture.thumbnail} alt={user.name.first} />
-            <p>{`${user.name.first} ${user.name.last}`}</p>
-            <p>{`Age: ${user.dob.age}`}</p>
-            <p>{`Gender: ${user.gender}`}</p>
-            <p>{`Nationality: ${user.nat}`}</p>
+        <h3 className="text-xl mb-1 mt-5 font-bold">Results</h3>
+        {loading ? (
+          <div className="grid place-items-center mt-10">
+            <span
+              className="animate-ping inline-flex h-10 w-10
+        rounded-full bg-gray-900 "
+            ></span>
           </div>
-        ))}
+        ) : (
+          <div>
+            {filteredUsers.map((user) => (
+              <div key={user.login.uuid}>
+                <UserCard
+                  image={user.picture.thumbnail}
+                  name={`${user.name.first}
+        ${user.name.last}`}
+                  age={user.dob.age}
+                  gender={user.gender}
+                  nationality={user.nat}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
