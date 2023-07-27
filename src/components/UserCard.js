@@ -8,7 +8,7 @@ dark:bg-gray-800 dark:border-gray-700 py-5 mb-6"
         <img
           className="w-24 h-24 mb-3 rounded-full shadow-lg"
           src={image}
-          alt={image}
+          alt={name}
         />
         <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
           {name}

@@ -4,8 +4,8 @@ import UserCard from "./UserCard";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [filteredUsers, setFilteredUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [nationality, setNationality] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
