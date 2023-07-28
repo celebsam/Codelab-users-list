@@ -70,6 +70,12 @@ const UserList = () => {
     handleFilter();
   }, [users, nationality, gender, searchName, age]);
 
+  const handleClear = () => {
+    setNationality("");
+    setAge("");
+    setGender("")
+    setSearchName("")
+  };
   return (
     <div>
       {/* Filter options */}
@@ -164,7 +170,15 @@ const UserList = () => {
 
       {/* Display users */}
       <div>
-        <h3 className="text-xl mb-1 mt-5 font-bold">Results</h3>
+        <div className="flex items-center justify-between mt-6 mb-3">
+          <h3 className="text-xl font-bold">Results</h3>
+          <button
+            onClick={handleClear}
+            className="bg-gray-700 py-2 px-6 text-white rounded-md"
+          >
+            Clear filters
+          </button>
+        </div>
         {loading ? (
           <div className="grid place-items-center mt-10">
             <span
